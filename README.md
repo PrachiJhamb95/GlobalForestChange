@@ -1,4 +1,4 @@
-# GlobalForestChange
+# GlobalForestChange_Python
 Using Google Earth Engine to evaluate annual forest loss in sub-saharan Africa
 **Quick summary: ** This is a Python-based analysis of the Hassen Forest Global Watch Data using Google Earth Engine. The goal is to access annual forest loss within each LSLA region. 
 
