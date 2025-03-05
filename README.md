@@ -8,6 +8,5 @@ Hansen, M. C., P. V. Potapov, R. Moore, M. Hancher, S. A. Turubanova, A. Tyukavi
 
 Repository structure:
 
-Data: a folder that stores the geojson files for the boundaries of project area and reference area.
-Docs: a folder that hosts the figures produced from python code and a project document.
+Data: a folder that stores the data downloaded from google earth engine. You need to register for an account to access that data.
 JupyterNotebook: stores the python codes in jupyter notebook.
