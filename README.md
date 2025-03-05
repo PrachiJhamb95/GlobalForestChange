@@ -9,4 +9,5 @@ Hansen, M. C., P. V. Potapov, R. Moore, M. Hancher, S. A. Turubanova, A. Tyukavi
 Repository structure:
 
 Data: a folder that stores the data downloaded from google earth engine. You need to register for an account to access that data.
+Javascript: used to download data from Google earth engine. 
 JupyterNotebook: stores the python codes in jupyter notebook.
