@@ -1,0 +1,63 @@
+// 1) Define the Hansen Global Forest Change dataset
+var hansenImage = ee.Image('UMD/hansen/global_forest_change_2023_v1_11');
+
+// 2) Load FAO GAUL level 2 boundaries (districts) - Already in GEE
+var gadmDistricts = ee.FeatureCollection("FAO/GAUL/2015/level2");
+
+// Debug: Print dataset structure
+print("GAUL Level 2 Districts First Feature:", gadmDistricts.first());
+print("GAUL Level 2 Districts Field Names:", gadmDistricts.first().propertyNames());
+print("Total Number of Districts:", gadmDistricts.size());
+print("Unique Country Names in GAUL Level 2:", gadmDistricts.aggregate_array('ADM0_NAME').distinct());
+
+// 3) List of countries we’re interested in
+var countries = [
+  "Ghana", "Guinea", "Liberia", "Malawi", "Nigeria",
+  "Zimbabwe", "Uganda", "Egypt", "Zambia", "Ethiopia"
+];
+
+// 4) Function to process and export data for each country (single GeoTIFF)
+countries.forEach(function(countryName) {
+  // Filter all districts for the specific country (using ADM0_NAME)
+  var countryDistricts = gadmDistricts.filter(ee.Filter.eq('ADM0_NAME', countryName));
+  
+  // Debug: Print the filtered collection and its size
+  print("Filtering for", countryName, "Number of Districts:", countryDistricts.size());
+  print("First District for", countryName, ":", countryDistricts.first());
+  
+  // Check if the collection is empty before proceeding
+  if (countryDistricts.size().getInfo() === 0) {
+    print("No districts found for", countryName, "- Check country name or dataset coverage.");
+    return; // Skip to the next country if no districts are found
+  }
+  
+  // Create a single geometry for the entire country (union of all districts)
+  var countryGeometry = countryDistricts.geometry().dissolve();
+  
+  // Select 'treecover2000' and 'lossyear' from the Hansen dataset and clip to the country
+  var forestProducts = hansenImage.select(['treecover2000', 'lossyear'])
+                                .clip(countryGeometry);
+  
+  // Optional: Add to map for visual inspection
+  Map.addLayer(countryGeometry, {color: 'red'}, countryName + " Boundary");
+  Map.addLayer(forestProducts, {bands: ['treecover2000'], min: 0, max: 100}, countryName + " TreeCover2000");
+  Map.addLayer(forestProducts, {bands: ['lossyear'], min: 1, max: 23, palette: ['000000', 'FF0000']}, countryName + " LossYear");
+  
+  // Export a single multi-band GeoTIFF for the country
+  Export.image.toDrive({
+    image: forestProducts,
+    description: 'ForestCover_LossYear_' + countryName,
+    scale: 30, // Hansen dataset resolution is 30m
+    region: countryGeometry.bounds(),
+    maxPixels: 1e13,
+    fileFormat: 'GeoTIFF',
+    folder: 'GEE_classification', // Adjust folder name as needed
+    formatOptions: {
+      cloudOptimized: true
+    },
+    skipEmptyTiles: true
+  });
+});
+
+// Zoom to first country (arbitrary choice)
+Map.centerObject(gadmDistricts.filter(ee.Filter.eq('ADM0_NAME', countries[0])), 6);
