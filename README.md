@@ -8,6 +8,6 @@ Hansen, M. C., P. V. Potapov, R. Moore, M. Hancher, S. A. Turubanova, A. Tyukavi
 
 Repository structure:
 
-Javascript: used to download data from Google earth engine. 
-JupyterNotebook: stores the python codes in jupyter notebook.
+Javascript: used to download data from Google earth engine. //
+JupyterNotebook: stores the python codes in jupyter notebook.//
 post-processing_code: post-process data files downloaded from Google earth engine in R to summarize treecover2000 and lossyear data at the district level.
